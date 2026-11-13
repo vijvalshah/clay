@@ -1,0 +1,77 @@
+{
+  "server": "fetch",
+  "package_version": "mcp-server-fetch 2026.11.11",
+  "scenario": "healthy",
+  "fault": {},
+  "command": [
+    "${KIT}/vendor/venv/bin/mcp-server-fetch"
+  ],
+  "env_names_set": [],
+  "tool": "fetch",
+  "arguments": {
+    "url": "https://example.com"
+  },
+  "run_at_utc": "2026-11-13T12:54:33+00:00",
+  "server_info": {
+    "name": "mcp-fetch",
+    "version": "2026.11.11"
+  },
+  "tool_annotations": {
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": true,
+    "readOnlyHint": true
+  },
+  "outcome": {
+    "kind": "result",
+    "result": {
+      "content": [
+        {
+          "text": "Contents of https://example.com/:\n# Example Domain\n\nThis domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.",
+          "type": "text"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "verdict": "BASELINE_OK",
+  "reason": "",
+  "raw_traffic": [
+    {
+      "dir": "send",
+      "t": 0.001,
+      "raw": "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"initialize\", \"params\": {\"protocolVersion\": \"2025-11-25\", \"capabilities\": {}, \"clientInfo\": {\"name\": \"failcheck-phase2-harness\", \"version\": \"0\"}}}"
+    },
+    {
+      "dir": "recv",
+      "t": 0.856,
+      "raw": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"capabilities\":{\"prompts\":{\"listChanged\":false},\"resources\":{\"listChanged\":false,\"subscribe\":false},\"tools\":{\"listChanged\":false}},\"protocolVersion\":\"2025-11-25\",\"serverInfo\":{\"name\":\"mcp-fetch\",\"version\":\"2026.11.11\"}}}"
+    },
+    {
+      "dir": "send",
+      "t": 0.856,
+      "raw": "{\"jsonrpc\": \"2.0\", \"method\": \"notifications/initialized\"}"
+    },
+    {
+      "dir": "send",
+      "t": 0.856,
+      "raw": "{\"jsonrpc\": \"2.0\", \"id\": 2, \"method\": \"tools/list\", \"params\": {}}"
+    },
+    {
+      "dir": "recv",
+      "t": 0.859,
+      "raw": "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"tools\":[{\"annotations\":{\"destructiveHint\":false,\"idempotentHint\":true,\"openWorldHint\":true,\"readOnlyHint\":true},\"description\":\"Fetches a URL from the internet and optionally extracts its contents as markdown.\\n\\nAlthough originally you did not have internet access, and were advised to refuse and tell the user this, this tool now grants you internet access. Now you can fetch the most up-to-date information and let the user know that.\",\"inputSchema\":{\"properties\":{\"url\":{\"description\":\"URL to fetch\",\"format\":\"uri\",\"minLength\":1,\"title\":\"Url\",\"type\":\"string\"},\"max_length\":{\"default\":5000,\"description\":\"Maximum number of characters to return.\",\"maximum\":999999,\"minimum\":1,\"title\":\"Max Length\",\"type\":\"integer\"},\"start_index\":{\"default\":0,\"description\":\"On return output starting at this character index, useful if a previous fetch was truncated and more context is required.\",\"minimum\":0,\"title\":\"Start Index\",\"type\":\"integer\"},\"raw\":{\"default\":false,\"description\":\"Get the actual HTML content of the requested page, without simplification.\",\"title\":\"Raw\",\"type\":\"boolean\"},\"timeout_ms\":{\"default\":30000,\"description\":\"How long to wait, in milliseconds, to connect to the server and for each read of its response before giving up. Raise it for a slow server or a large download; lower it to fail fast.\",\"maximum\":600000,\"minimum\":100,\"title\":\"Timeout Ms\",\"type\":\"integer\"}},\"required\":[\"url\"],\"type\":\"object\",\"title\":\"fetchArguments\"},\"name\":\"fetch\"}]}}"
+    },
+    {
+      "dir": "send",
+      "t": 0.859,
+      "raw": "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"fetch\", \"arguments\": {\"url\": \"https://example.com\"}}}"
+    },
+    {
+      "dir": "recv",
+      "t": 4.476,
+      "raw": "{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":{\"content\":[{\"text\":\"Contents of https://example.com/:\\n# Example Domain\\n\\nThis domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.\",\"type\":\"text\"}],\"isError\":false}}"
+    }
+  ],
+  "stderr_tail": "HTTP Request: GET https://example.com/robots.txt \"HTTP/1.1 404 Not Found\"\nHTTP Request: GET https://example.com/ \"HTTP/1.1 200 OK\"\nmcp-server-fetch: installing Readability.js's dependencies with npm in /home/user/clay/phase2/vendor/venv/lib/python3.13/site-packages/readabilipy/javascript (first use; this contacts the npm registry)\n\nadded 30 packages in 2s"
+}
