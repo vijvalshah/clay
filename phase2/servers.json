@@ -54,7 +54,7 @@
       "name": "azure-devops",
       "version": "@azure-devops/mcp 2.11.0",
       "category": "microsoft/dev",
-      "command": ["${KIT}/vendor/node_modules/.bin/mcp-server-azuredevops", "${ADO_ORG}", "--authentication", "env"],
+      "command": ["${KIT}/vendor/node_modules/.bin/mcp-server-azuredevops", "${ADO_ORG}", "--authentication", "envvar"],
       "pass_env": ["ADO_ORG"],
       "secret_env": ["ADO_MCP_AUTH_TOKEN"],
       "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
