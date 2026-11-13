@@ -7,3 +7,4 @@ __pycache__/
 node_modules/
 phase2/vendor/
 phase2/.env
+phase2-kit.tar.gz
