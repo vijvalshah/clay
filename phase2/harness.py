@@ -252,9 +252,28 @@ def dead_port():
     return port
 
 
+KIT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def subst(text, lookup):
+    """Replace ${NAME} with lookup[NAME] (empty string if unset)."""
+    return re.sub(r"\$\{(\w+)\}", lambda m: lookup.get(m.group(1), ""), text)
+
+
+def missing_env(cfg, secrets):
+    """Names the server needs that are not set. Optional secrets never count."""
+    need = list(cfg.get("pass_env", []))
+    if not cfg.get("secret_optional"):
+        need += cfg.get("secret_env", [])
+    return [n for n in need if not secrets.get(n)]
+
+
 def build_env(cfg, scenario, secrets):
     env = dict(os.environ)
     env.update(cfg.get("env", {}))
+    for name in cfg.get("pass_env", []):
+        if name in secrets:
+            env[name] = secrets[name]
     for name in cfg.get("secret_env", []):
         if name in secrets:
             env[name] = secrets[name]
@@ -301,7 +320,8 @@ def check_tool_is_safe(tool_name, tools):
 def run_scenario(cfg, scenario, secrets, baseline):
     env, fault = build_env(cfg, scenario, secrets)
     cmd = cfg["command"]
-    sess = RawSession(cmd, env, cwd=cfg.get("cwd"))
+    lookup = {**env, "KIT": KIT_DIR}
+    sess = RawSession([subst(a, lookup) for a in cmd], env, cwd=cfg.get("cwd"))
     meta = {"server_info": None, "tool_annotations": None}
     outcome = None
     try:
@@ -337,7 +357,7 @@ def run_scenario(cfg, scenario, secrets, baseline):
         "scenario": scenario,
         "fault": fault,
         "command": cmd,
-        "env_names_set": sorted(set(cfg.get("env", {})) | set(cfg.get("secret_env", []))),
+        "env_names_set": sorted(set(cfg.get("env", {})) | set(cfg.get("secret_env", [])) | set(cfg.get("pass_env", []))),
         "tool": cfg["tool"],
         "arguments": cfg.get("arguments", {}),
         "run_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
@@ -382,12 +402,17 @@ def main(argv=None):
     for cfg in configs:
         if args.server and cfg["name"] != args.server:
             continue
+        miss = missing_env(cfg, secrets)
+        if miss:
+            rows.append((cfg["name"], "-", "SKIPPED", "env not set: " + ", ".join(miss)))
+            continue
         outdir = os.path.join(args.evidence, cfg["name"], stamp)
         os.makedirs(outdir, exist_ok=True)
         baseline = None
         for sc in ["healthy"] + [s for s in wanted if s != "healthy"]:
-            if sc == "bad_creds" and not cfg.get("secret_env"):
-                rows.append((cfg["name"], sc, "SKIPPED", "server has no credential to break"))
+            has_secret = any(secrets.get(n) for n in cfg.get("secret_env", []))
+            if sc == "bad_creds" and not has_secret:
+                rows.append((cfg["name"], sc, "SKIPPED", "no credential set to break"))
                 continue
             res = run_scenario(cfg, sc, secrets, baseline)
             if sc == "healthy":

@@ -1,0 +1,96 @@
+{
+  "_comment": "Batch 1. Tool names and read-only hints were read from each server's tools/list (offline, no credentials). Versions are pinned in setup.sh.",
+  "servers": [
+    {
+      "name": "notion",
+      "version": "@notionhq/notion-mcp-server 2.6.1",
+      "category": "docs/wiki",
+      "command": ["${KIT}/vendor/node_modules/.bin/notion-mcp-server"],
+      "secret_env": ["NOTION_TOKEN"],
+      "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
+      "tool": "API-get-users",
+      "arguments": {}
+    },
+    {
+      "name": "sentry",
+      "version": "@sentry/mcp-server 0.49.0",
+      "category": "observability",
+      "command": ["${KIT}/vendor/node_modules/.bin/sentry-mcp", "mcp"],
+      "secret_env": ["SENTRY_AUTH_TOKEN"],
+      "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
+      "tool": "find_organizations",
+      "arguments": {}
+    },
+    {
+      "name": "clarity",
+      "version": "@microsoft/clarity-mcp-server 2.0.1",
+      "category": "microsoft/analytics",
+      "command": ["${KIT}/vendor/node_modules/.bin/clarity-mcp-server"],
+      "secret_env": ["CLARITY_API_TOKEN"],
+      "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
+      "tool": "query-analytics-dashboard",
+      "arguments": {"query": "Total number of sessions in the last 3 days"}
+    },
+    {
+      "name": "context7",
+      "version": "@upstash/context7-mcp 4.7.0",
+      "category": "library docs lookup",
+      "command": ["${KIT}/vendor/node_modules/.bin/context7-mcp"],
+      "secret_env": ["CONTEXT7_API_KEY"],
+      "secret_optional": true,
+      "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
+      "tool": "resolve-library-id",
+      "arguments": {"libraryName": "react", "query": "useState hook"}
+    },
+    {
+      "name": "fetch",
+      "version": "mcp-server-fetch 2026.11.11",
+      "category": "web fetch (no credential: network fault only)",
+      "command": ["${KIT}/vendor/venv/bin/mcp-server-fetch"],
+      "tool": "fetch",
+      "arguments": {"url": "https://example.com"}
+    },
+    {
+      "name": "azure-devops",
+      "version": "@azure-devops/mcp 2.11.0",
+      "category": "microsoft/dev",
+      "command": ["${KIT}/vendor/node_modules/.bin/mcp-server-azuredevops", "${ADO_ORG}", "--authentication", "env"],
+      "pass_env": ["ADO_ORG"],
+      "secret_env": ["ADO_MCP_AUTH_TOKEN"],
+      "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
+      "tool": "core_list_projects",
+      "arguments": {}
+    },
+    {
+      "name": "ms365-calendar",
+      "version": "@softeria/ms-365-mcp-server 0.184.2",
+      "category": "microsoft/email+calendar (community server)",
+      "command": ["${KIT}/vendor/node_modules/.bin/ms-365-mcp-server"],
+      "secret_env": ["MS365_MCP_OAUTH_TOKEN"],
+      "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
+      "tool": "list-calendar-events",
+      "arguments": {}
+    },
+    {
+      "name": "ms365-mail",
+      "version": "@softeria/ms-365-mcp-server 0.184.2",
+      "category": "microsoft/email+calendar (community server)",
+      "command": ["${KIT}/vendor/node_modules/.bin/ms-365-mcp-server"],
+      "secret_env": ["MS365_MCP_OAUTH_TOKEN"],
+      "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
+      "tool": "list-mail-messages",
+      "arguments": {}
+    },
+    {
+      "name": "lokka",
+      "version": "@merill/lokka 2.1.2",
+      "category": "microsoft/graph (community server; optional, needs an Entra app registration)",
+      "command": ["${KIT}/vendor/node_modules/.bin/lokka"],
+      "pass_env": ["TENANT_ID", "CLIENT_ID"],
+      "secret_env": ["CLIENT_SECRET"],
+      "network_down_env": {"NODE_USE_ENV_PROXY": "1"},
+      "tool": "Lokka-Microsoft",
+      "arguments": {"apiType": "graph", "path": "/users", "method": "get", "queryParams": {"$top": "1"}}
+    }
+  ]
+}

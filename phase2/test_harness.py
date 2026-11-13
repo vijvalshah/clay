@@ -152,3 +152,13 @@ def test_secret_never_written_to_evidence(upstream_url):
     secret = "good-token"
     base = harness.run_scenario(c, "healthy", {"TOKEN": secret}, None)
     assert secret not in json.dumps(base)
+
+
+# ---- config helpers -------------------------------------------------------
+
+def test_subst_and_missing_env():
+    assert harness.subst("a-${X}-${Y}", {"X": "1"}) == "a-1-"
+    c = {"pass_env": ["ORG"], "secret_env": ["TOK"]}
+    assert harness.missing_env(c, {"ORG": "o"}) == ["TOK"]
+    assert harness.missing_env(dict(c, secret_optional=True), {"ORG": "o"}) == []
+    assert harness.missing_env(c, {"ORG": "o", "TOK": "t"}) == []
